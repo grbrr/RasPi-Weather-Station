@@ -12,4 +12,4 @@ sudo chmod -R a+rwx .venv
 # Installing requirements components
 source .venv/bin/activate
 python3 -m pip install -r requirements.txt
-source .venv/bin/deactivate
+deactivate
