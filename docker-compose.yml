@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  influxdb:
+    image: influxdb
+    networks:
+      weather-network:
+        ipv4_address: 172.18.0.2
+    ports:
+      - 8086:8086
+    restart: always
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${login}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${password}
+      - DOCKER_INFLUXDB_INIT_ORG=Home
+      - DOCKER_INFLUXDB_INIT_BUCKET=Weather
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${token}
+        #dostęp do bazy przez node-red i grafanę
+
+
+networks:
+  weather-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
