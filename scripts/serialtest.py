@@ -68,4 +68,8 @@ while 1:
             .field("Humidity", data["Humidity"])
             .field("Pressure", data["Pressure"])
         )
-        write_api.write(bucket=bucket, org="Home", record=record)
+        try:
+            write_api.write(bucket=bucket, org="Home", record=record)
+        except Exception as e:
+            print("Error while writing to influxdb:", e)
+            

@@ -4,7 +4,6 @@ services:
     image: influxdb
     networks:
       weather-network:
-        ipv4_address: 172.18.0.2
     ports:
       - 8086:8086
     restart: always
@@ -15,12 +14,38 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=Home
       - DOCKER_INFLUXDB_INIT_BUCKET=Weather
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${token}
-        #dostęp do bazy przez node-red i grafanę
+    volumes:
+      - myInfluxVolume:/var/lib/influxdb2
 
+  grafana:
+    image: grafana/grafana
+    networks:
+      weather-network:
+    ports:
+      - 3000:3000
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${password}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_USERS_ALLOW_ORG_CREATE=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Home
+      - GF_AUTH_ANONYMOUS_ORG_ID=1
+      - GF_AUTH_ANONYMOUS_USER=true
+      - GF_AUTH_ANONYMOUS_USER_NAME=anonymous
+      - GF_AUTH_ANONYMOUS_USER_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_USER_ORG_NAME=Home
+      - GF_AUTH_ANONYMOUS_USER_ORG_ID=1
+    volumes:
+      - myGrafanaVolume:/var/lib/grafana
+
+volumes:
+  myInfluxVolume:
+    driver: local
+  myGrafanaVolume:
+    driver: local
 
 networks:
   weather-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/24
