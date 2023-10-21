@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include "bme280_interface.h"
 #include "bme280_defs.h"
+#include "weather_data.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,6 +73,9 @@ int random2(int min, int max)
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+struct weather_data data_collection =
+{ .temperature = 0, .pressure = 0, .humidity = 0 };
 
 /* USER CODE END 0 */
 
@@ -122,7 +126,7 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		if (BME280_read_data() != BME280_OK)
+		if (BME280_read_data(&data_collection) != BME280_OK)
 		{
 			printf("Blad odczytu!\n");
 		}
@@ -186,13 +190,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 
 	static uint16_t cnt = 0; // Licznik wyslanych wiadomosci
-	char data[80]; // Tablica przechowujaca wysylana wiadomosc.
+	char data[200]; // Tablica przechowujaca wysylana wiadomosc.
 	uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt; // Zwiekszenie licznika wyslanych wiadomosci.
 
 	++cnt; // Zwiekszenie licznika wyslanych wiadomosci.
 	size = sprintf(data,
-			"{\"Temperature\" : %d, \"Pressure\" : %d, \"Humidity\" : %d}\r\n",
-			random2(5, 15), random2(50, 60), random2(40, 50));
+			"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld}\r\n",
+			data_collection.temperature, data_collection.pressure, data_collection.humidity);
 //random(5, 12), random(50, 60), random(40, 50)); // Stworzenie wiadomosci do wyslania oraz przypisanie ilosci wysylanych znakow do zmiennej size.
 	HAL_UART_Transmit_IT(&huart1, (uint8_t*) &data, size); // Rozpoczecie nadawania danych z wykorzystaniem przerwan
 	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // Zmiana stanu pinu na diodzie LED

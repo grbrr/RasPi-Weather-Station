@@ -11,6 +11,6 @@
 ../Core/Src/bme280.c:502:8:bme280_set_sensor_settings	8
 ../Core/Src/bme280.c:569:8:bme280_set_sensor_mode	6
 ../Core/Src/bme280.c:706:6:bme280_parse_sensor_data	1
-../Core/Src/bme280.c:736:8:bme280_compensate_data	14
+../Core/Src/bme280.c:736:8:bme280_compensate_data	13
 ../Core/Src/bme280.c:667:8:bme280_get_sensor_data	4
 ../Core/Src/bme280.c:779:10:bme280_cal_meas_delay	4

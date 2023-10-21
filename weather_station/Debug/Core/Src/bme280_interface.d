@@ -1,6 +1,7 @@
 Core/Src/bme280_interface.o: ../Core/Src/bme280_interface.c \
  ../Core/Inc/bme280.h ../Core/Inc/bme280_defs.h \
- ../Core/Inc/bme280_interface.h ../Core/Inc/i2c.h ../Core/Inc/main.h \
+ ../Core/Inc/bme280_interface.h ../Core/Inc/weather_data.h \
+ ../Core/Inc/i2c.h ../Core/Inc/main.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h \
  ../Core/Inc/stm32f0xx_hal_conf.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc.h \
@@ -33,6 +34,7 @@ Core/Src/bme280_interface.o: ../Core/Src/bme280_interface.c \
 ../Core/Inc/bme280.h:
 ../Core/Inc/bme280_defs.h:
 ../Core/Inc/bme280_interface.h:
+../Core/Inc/weather_data.h:
 ../Core/Inc/i2c.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h:
