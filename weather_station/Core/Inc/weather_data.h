@@ -8,7 +8,8 @@
 #ifndef INC_WEATHER_DATA_H_
 #define INC_WEATHER_DATA_H_
 
-struct weather_data {
+struct weather_data
+{
 	uint32_t pressure;
 	int32_t temperature;
 	uint32_t humidity;

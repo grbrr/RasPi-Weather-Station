@@ -41,13 +41,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_macro  00012dd8  00000000  00000000  0004add2  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_line   0001db5a  00000000  00000000  0005dbaa  2**0
+ 19 .debug_line   0001db6e  00000000  00000000  0005dbaa  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_str    0006b34e  00000000  00000000  0007b704  2**0
+ 20 .debug_str    0006b35d  00000000  00000000  0007b718  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_frame  00003940  00000000  00000000  000e6a54  2**2
+ 21 .debug_frame  00003940  00000000  00000000  000e6a78  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000057  00000000  00000000  000ea394  2**0
+ 22 .debug_line_str 00000057  00000000  00000000  000ea3b8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2077,33 +2077,41 @@ static int8_t null_ptr_check(const struct bme280_dev *dev)
  8000dd6:	4240      	negs	r0, r0
  8000dd8:	e7fa      	b.n	8000dd0 <bme280_get_sensor_data+0x4c>
 
-08000dda <delay_ms>:
+08000dda <user_delay_ms>:
 
 	return rslt;
 }
 
-void delay_ms(uint32_t period)
+void user_delay_ms(uint32_t period)
 {
  8000dda:	b510      	push	{r4, lr}
+	/*
+	 * Return control or wait,
+	 * for a period amount of milliseconds
+	 */
 	HAL_Delay(period);
  8000ddc:	f000 fb36 	bl	800144c <HAL_Delay>
 }
  8000de0:	bd10      	pop	{r4, pc}
 	...
 
-08000de4 <i2c_read>:
+08000de4 <user_i2c_read>:
 
-int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
+int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
 		uint16_t len)
 {
  8000de4:	b530      	push	{r4, r5, lr}
  8000de6:	0015      	movs	r5, r2
-	int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
+	 * | Read       | (reg_data[len - 1]) |
+	 * | Stop       | -                   |
+	 * |------------+---------------------|
+	 */
+
 	HAL_I2C_Mem_Read(&hi2c1, dev_id, reg_addr, 1, reg_data, len, 100);
  8000de8:	000a      	movs	r2, r1
  8000dea:	0001      	movs	r1, r0
  8000dec:	2064      	movs	r0, #100	; 0x64
- 8000dee:	4c06      	ldr	r4, [pc, #24]	; (8000e08 <i2c_read+0x24>)
+ 8000dee:	4c06      	ldr	r4, [pc, #24]	; (8000e08 <user_i2c_read+0x24>)
 {
  8000df0:	b085      	sub	sp, #20
 	HAL_I2C_Mem_Read(&hi2c1, dev_id, reg_addr, 1, reg_data, len, 100);
@@ -2121,19 +2129,23 @@ int8_t i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
  8000e06:	46c0      	nop			; (mov r8, r8)
  8000e08:	200000d4 	.word	0x200000d4
 
-08000e0c <i2c_write>:
+08000e0c <user_i2c_write>:
 
-int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
+int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
 		uint16_t len)
 {
  8000e0c:	b530      	push	{r4, r5, lr}
  8000e0e:	0015      	movs	r5, r2
-	int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
+	 * | Write      | (reg_data[len - 1]) |
+	 * | Stop       | -                   |
+	 * |------------+---------------------|
+	 */
+
 	HAL_I2C_Mem_Write(&hi2c1, dev_id, reg_addr, 1, reg_data, len, 100);
  8000e10:	000a      	movs	r2, r1
  8000e12:	0001      	movs	r1, r0
  8000e14:	2064      	movs	r0, #100	; 0x64
- 8000e16:	4c06      	ldr	r4, [pc, #24]	; (8000e30 <i2c_write+0x24>)
+ 8000e16:	4c06      	ldr	r4, [pc, #24]	; (8000e30 <user_i2c_write+0x24>)
 {
  8000e18:	b085      	sub	sp, #20
 	HAL_I2C_Mem_Write(&hi2c1, dev_id, reg_addr, 1, reg_data, len, 100);
@@ -2156,52 +2168,52 @@ int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
  8000e34:	23fe      	movs	r3, #254	; 0xfe
 {
  8000e36:	b570      	push	{r4, r5, r6, lr}
-	bme.intf = BME280_I2C_INTF;
+	dev.intf = BME280_I2C_INTF;
  8000e38:	2601      	movs	r6, #1
 	init_done = BME280_E_DEV_NOT_FOUND;
  8000e3a:	4c11      	ldr	r4, [pc, #68]	; (8000e80 <BME280_init+0x4c>)
-	bme.dev_id = (BME280_I2C_ADDR_PRIM << 1);
+	dev.dev_id = (BME280_I2C_ADDR_PRIM << 1);
  8000e3c:	4d11      	ldr	r5, [pc, #68]	; (8000e84 <BME280_init+0x50>)
 	init_done = BME280_E_DEV_NOT_FOUND;
  8000e3e:	7023      	strb	r3, [r4, #0]
-	bme.dev_id = (BME280_I2C_ADDR_PRIM << 1);
+	dev.dev_id = (BME280_I2C_ADDR_PRIM << 1);
  8000e40:	3b12      	subs	r3, #18
  8000e42:	706b      	strb	r3, [r5, #1]
-	bme.read = i2c_read;
+	dev.read = user_i2c_read;
  8000e44:	4b10      	ldr	r3, [pc, #64]	; (8000e88 <BME280_init+0x54>)
-	rslt = bme280_init(&bme);
+	rslt = bme280_init(&dev);
  8000e46:	0028      	movs	r0, r5
-	bme.read = i2c_read;
+	dev.read = user_i2c_read;
  8000e48:	606b      	str	r3, [r5, #4]
-	bme.write = i2c_write;
+	dev.write = user_i2c_write;
  8000e4a:	4b10      	ldr	r3, [pc, #64]	; (8000e8c <BME280_init+0x58>)
-	bme.intf = BME280_I2C_INTF;
+	dev.intf = BME280_I2C_INTF;
  8000e4c:	70ae      	strb	r6, [r5, #2]
-	bme.write = i2c_write;
+	dev.write = user_i2c_write;
  8000e4e:	60ab      	str	r3, [r5, #8]
-	bme.delay_ms = delay_ms;
+	dev.delay_ms = user_delay_ms;
  8000e50:	4b0f      	ldr	r3, [pc, #60]	; (8000e90 <BME280_init+0x5c>)
  8000e52:	60eb      	str	r3, [r5, #12]
-	rslt = bme280_init(&bme);
+	rslt = bme280_init(&dev);
  8000e54:	f7ff fcc0 	bl	80007d8 <bme280_init>
-	bme.settings.osr_p = BME280_OVERSAMPLING_16X;
+	dev.settings.osr_p = BME280_OVERSAMPLING_16X;
  8000e58:	4b0e      	ldr	r3, [pc, #56]	; (8000e94 <BME280_init+0x60>)
  8000e5a:	63ab      	str	r3, [r5, #56]	; 0x38
-	bme.settings.standby_time = BME280_STANDBY_TIME_62_5_MS;
+	dev.settings.standby_time = BME280_STANDBY_TIME_62_5_MS;
  8000e5c:	002b      	movs	r3, r5
  8000e5e:	333c      	adds	r3, #60	; 0x3c
  8000e60:	701e      	strb	r6, [r3, #0]
 	if (rslt == BME280_OK)
  8000e62:	2800      	cmp	r0, #0
  8000e64:	d10a      	bne.n	8000e7c <BME280_init+0x48>
-		rslt = bme280_set_sensor_settings(settings_sel, &bme);
+		rslt = bme280_set_sensor_settings(settings_sel, &dev);
  8000e66:	0029      	movs	r1, r5
  8000e68:	301f      	adds	r0, #31
  8000e6a:	f7ff fd4c 	bl	8000906 <bme280_set_sensor_settings>
 		if (rslt == BME280_OK)
  8000e6e:	2800      	cmp	r0, #0
  8000e70:	d104      	bne.n	8000e7c <BME280_init+0x48>
-			rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &bme);
+			rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
  8000e72:	0029      	movs	r1, r5
  8000e74:	3003      	adds	r0, #3
  8000e76:	f7ff fd77 	bl	8000968 <bme280_set_sensor_mode>
@@ -2211,7 +2223,7 @@ int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
  8000e7c:	bd70      	pop	{r4, r5, r6, pc}
  8000e7e:	46c0      	nop			; (mov r8, r8)
  8000e80:	200000d0 	.word	0x200000d0
- 8000e84:	20000084 	.word	0x20000084
+ 8000e84:	20000090 	.word	0x20000090
  8000e88:	08000de5 	.word	0x08000de5
  8000e8c:	08000e0d 	.word	0x08000e0d
  8000e90:	08000ddb 	.word	0x08000ddb
@@ -2229,27 +2241,27 @@ int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
  8000ea0:	b25b      	sxtb	r3, r3
  8000ea2:	2b00      	cmp	r3, #0
  8000ea4:	d112      	bne.n	8000ecc <BME280_read_data+0x34>
-		rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &bme);
+		rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
  8000ea6:	4c0c      	ldr	r4, [pc, #48]	; (8000ed8 <BME280_read_data+0x40>)
  8000ea8:	4f0c      	ldr	r7, [pc, #48]	; (8000edc <BME280_read_data+0x44>)
  8000eaa:	0021      	movs	r1, r4
  8000eac:	003a      	movs	r2, r7
  8000eae:	2007      	movs	r0, #7
  8000eb0:	f7ff ff68 	bl	8000d84 <bme280_get_sensor_data>
-		bme.delay_ms(70);
+		dev.delay_ms(70);
  8000eb4:	68fb      	ldr	r3, [r7, #12]
-		rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &bme);
+		rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
  8000eb6:	0006      	movs	r6, r0
-		bme.delay_ms(70);
+		dev.delay_ms(70);
  8000eb8:	2046      	movs	r0, #70	; 0x46
  8000eba:	4798      	blx	r3
-		data->humidity=comp_data.humidity;
+		data->humidity = comp_data.humidity;
  8000ebc:	68a3      	ldr	r3, [r4, #8]
  8000ebe:	60ab      	str	r3, [r5, #8]
-		data->pressure=comp_data.pressure;
+		data->pressure = comp_data.pressure;
  8000ec0:	6823      	ldr	r3, [r4, #0]
  8000ec2:	602b      	str	r3, [r5, #0]
-		data->temperature=comp_data.temperature;
+		data->temperature = comp_data.temperature;
  8000ec4:	6863      	ldr	r3, [r4, #4]
  8000ec6:	606b      	str	r3, [r5, #4]
 }
@@ -2261,8 +2273,8 @@ int8_t i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data,
  8000ed0:	e7fa      	b.n	8000ec8 <BME280_read_data+0x30>
  8000ed2:	46c0      	nop			; (mov r8, r8)
  8000ed4:	200000d0 	.word	0x200000d0
- 8000ed8:	200000c4 	.word	0x200000c4
- 8000edc:	20000084 	.word	0x20000084
+ 8000ed8:	20000084 	.word	0x20000084
+ 8000edc:	20000090 	.word	0x20000090
 
 08000ee0 <MX_GPIO_Init>:
         * Output
