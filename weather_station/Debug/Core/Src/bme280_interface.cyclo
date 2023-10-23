@@ -1,5 +1,0 @@
-../Core/Src/bme280_interface.c:75:6:user_delay_ms	1
-../Core/Src/bme280_interface.c:84:8:user_i2c_read	1
-../Core/Src/bme280_interface.c:113:8:user_i2c_write	1
-../Core/Src/bme280_interface.c:17:8:BME280_init	3
-../Core/Src/bme280_interface.c:59:8:BME280_read_data	2

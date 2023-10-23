@@ -27,9 +27,10 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include "weather_data.h"
 #include "bme280_interface.h"
 #include "bme280_defs.h"
-#include "weather_data.h"
+#include "bh1750.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,7 +76,7 @@ int random2(int min, int max)
 /* USER CODE BEGIN 0 */
 
 struct weather_data data_collection =
-{ .temperature = 0, .pressure = 0, .humidity = 0 };
+{ .temperature = 0, .pressure = 0, .humidity = 0, .ambient_light = 0 };
 
 /* USER CODE END 0 */
 
@@ -112,7 +113,7 @@ int main(void)
 	MX_I2C1_Init();
 	/* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start_IT(&htim14);
-	srand(145);
+
 	if (BME280_init() != BME280_OK)
 	{
 		printf("Blad inicjalizacji!\n");
@@ -123,6 +124,12 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
+
+		if (BH1750_read_data(&data_collection) != HAL_OK)
+		{
+			printf("Blad odczytu!\n");
+		}
+		HAL_Delay(500);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -130,7 +137,7 @@ int main(void)
 		{
 			printf("Blad odczytu!\n");
 		}
-		HAL_Delay(1000);
+		HAL_Delay(500);
 	}
 	/* USER CODE END 3 */
 }
@@ -194,9 +201,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt; // Zwiekszenie licznika wyslanych wiadomosci.
 
 	++cnt; // Zwiekszenie licznika wyslanych wiadomosci.
-	size = sprintf(data,
-			"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld}\r\n",
-			data_collection.temperature, data_collection.pressure, data_collection.humidity);
+	size =
+			sprintf(data,
+					"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld, \"Ambient Light\" : %d}\r\n",
+					data_collection.temperature, data_collection.pressure,
+					data_collection.humidity, data_collection.ambient_light);
 //random(5, 12), random(50, 60), random(40, 50)); // Stworzenie wiadomosci do wyslania oraz przypisanie ilosci wysylanych znakow do zmiennej size.
 	HAL_UART_Transmit_IT(&huart1, (uint8_t*) &data, size); // Rozpoczecie nadawania danych z wykorzystaniem przerwan
 	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // Zmiana stanu pinu na diodzie LED
