@@ -41,8 +41,13 @@ ser = serial.Serial(
 def get_JSON_from_serial():
     x = ser.readline()
     try:
-        data = json.loads(x)
-        return data
+        x = x.decode("utf-8")
+        if x[0] == "{" and x[-3] == "}":
+            data = json.loads(x)
+            return data
+        else:
+            print(x)
+            return None
     except Exception as e:
         print("Error while reading serial:", e)
         return None

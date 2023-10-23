@@ -1,5 +1,3 @@
-## Launching I2C
-# sudo raspi-config nonint do_i2c 0
 # sudo bash -c 'echo enable_uart=1 >> /boot/config.txt'
 
 ## Installing components that might be missing
