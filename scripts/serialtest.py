@@ -9,16 +9,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-token = os.getenv('token')
+token = os.getenv("token")
 org = "Home"
 url = "http://weatherpi.local:8086"
 
 client = influxdb_client.InfluxDBClient(url=url, token=token, org=org)
 
-bucket="Weather"
+bucket = "Weather"
 
 write_api = client.write_api(write_options=SYNCHRONOUS)
-   
+
 """ for value in range(5):
   point = (
     Point("measurement1")
@@ -60,6 +60,7 @@ while 1:
         data["Temperature"] = data["Temperature"] / 100
         data["Humidity"] = round(data["Humidity"] / 1024, 2)
         data["Pressure"] = data["Pressure"] / 100
+        data["Ambient Light"] = round(data["Ambient Light"] / 1.2, 2)
         print(str(data))
         record = (
             Point("BME280")
@@ -67,9 +68,9 @@ while 1:
             .field("Temperature", data["Temperature"])
             .field("Humidity", data["Humidity"])
             .field("Pressure", data["Pressure"])
+            .field("Ambient Light", data["Ambient Light"])
         )
         try:
             write_api.write(bucket=bucket, org="Home", record=record)
         except Exception as e:
             print("Error while writing to influxdb:", e)
-            
