@@ -34,17 +34,6 @@ All of these below are going to be set by scripts in this repository, but if you
 Copy .py scripts and .bash files to your Raspberry Pi. Run `bash prepareEnvironment.bash` to install all necessary libraries and create database in InfluxDB.
 You also need to enable UART comm and disable shell via this interface. To do so, run `sudo raspi-config` and go to `Interfacing Options` -> `Serial Port` and when asked about login shell accessibility choose **No**. When asked about enabling port hardware choose **Yes**. Reboot your Raspberry Pi.
 
-## Sharp pinout
-
-| PIN | Function    | Connected to              |
-| --- | ----------- | ------------------------- |
-| 1   | V-LED       | RasPi 5V    |
-| 2   | LED-GND     | RasPi GND   |
-| 3   | LED         | RasPi 5V    |
-| 4   | S-GND       | RasPi GND   |
-| 5   | Vo          |    |
-| 6   | Vcc         | RasPi 5V    |
-
 ## External libraries used
 
 [BME280 driver, version 3.4.3](https://github.com/boschsensortec/BME280_driver/tree/bme280_v3.4.3), newer versions use [COINES API](https://github.com/boschsensortec/COINES), it doesn't fit to this project

@@ -57,19 +57,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-int random2(int min, int max)
-{
-	int tmp;
-	if (max >= min)
-		max -= min;
-	else
-	{
-		tmp = min - max;
-		min = max;
-		max = tmp;
-	}
-	return max ? (rand() % max + min) : min;
-}
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -127,17 +115,35 @@ int main(void)
 
 		if (BH1750_read_data(&data_collection) != HAL_OK)
 		{
-			printf("Blad odczytu!\n");
+			char data[80]; // Tablica przechowujaca wysylana wiadomosc.
+			uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
+			size = sprintf(data, "Error while reading BH1750\r\n");
+			HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
 		}
-		HAL_Delay(500);
+		HAL_Delay(200);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
 		if (BME280_read_data(&data_collection) != BME280_OK)
 		{
-			printf("Blad odczytu!\n");
+			char data[80]; // Tablica przechowujaca wysylana wiadomosc.
+			uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
+			size = sprintf(data, "Error while reading BME280\r\n");
+			HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
 		}
-		HAL_Delay(500);
+		HAL_Delay(200);
+
+		char data[200]; // Tablica przechowujaca wysylana wiadomosc.
+		uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
+		size =
+				sprintf(data,
+						"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld, \"Ambient Light\" : %d}\r\n",
+						data_collection.temperature, data_collection.pressure,
+						data_collection.humidity,
+						data_collection.ambient_light);
+
+		HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100); // Rozpoczecie nadawania danych z wykorzystaniem przerwan
+		HAL_Delay(200);
 	}
 	/* USER CODE END 3 */
 }
@@ -195,19 +201,15 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-
-	static uint16_t cnt = 0; // Licznik wyslanych wiadomosci
-	char data[200]; // Tablica przechowujaca wysylana wiadomosc.
-	uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt; // Zwiekszenie licznika wyslanych wiadomosci.
-
-	++cnt; // Zwiekszenie licznika wyslanych wiadomosci.
-	size =
-			sprintf(data,
-					"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld, \"Ambient Light\" : %d}\r\n",
-					data_collection.temperature, data_collection.pressure,
-					data_collection.humidity, data_collection.ambient_light);
-//random(5, 12), random(50, 60), random(40, 50)); // Stworzenie wiadomosci do wyslania oraz przypisanie ilosci wysylanych znakow do zmiennej size.
-	HAL_UART_Transmit_IT(&huart1, (uint8_t*) &data, size); // Rozpoczecie nadawania danych z wykorzystaniem przerwan
+//	char data[200]; // Tablica przechowujaca wysylana wiadomosc.
+//	uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
+//	size =
+//			sprintf(data,
+//					"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld, \"Ambient Light\" : %d}\r\n",
+//					data_collection.temperature, data_collection.pressure,
+//					data_collection.humidity, data_collection.ambient_light);
+//
+//	HAL_UART_Transmit_IT(&huart1, (uint8_t*) &data, size); // Rozpoczecie nadawania danych z wykorzystaniem przerwan
 	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // Zmiana stanu pinu na diodzie LED
 }
 /* USER CODE END 4 */
