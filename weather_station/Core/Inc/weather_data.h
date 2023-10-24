@@ -17,6 +17,7 @@ struct weather_data
 	int32_t temperature;
 	uint32_t humidity;
 	uint16_t ambient_light;
+	uint16_t dust;
 };
 
 extern struct weather_data data_collection;
