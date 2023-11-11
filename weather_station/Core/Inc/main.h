@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Hall_In_Pin GPIO_PIN_1
+#define Hall_In_GPIO_Port GPIOA
+#define Sharp_Out_Pin GPIO_PIN_2
+#define Sharp_Out_GPIO_Port GPIOA
 #define VCP_TX_Pin GPIO_PIN_9
 #define VCP_TX_GPIO_Port GPIOA
 #define VCP_RX_Pin GPIO_PIN_10
