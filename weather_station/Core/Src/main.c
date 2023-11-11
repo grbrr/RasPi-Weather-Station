@@ -137,7 +137,7 @@ int main(void)
 			size = sprintf(data, "Error while reading BME280\r\n");
 			HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
 		}
-		HAL_Delay(10);
+		HAL_Delay(100);
 
 	}
 	/* USER CODE END 3 */
