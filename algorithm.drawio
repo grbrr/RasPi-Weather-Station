@@ -1,0 +1,191 @@
+<mxfile host="65bd71144e">
+    <diagram id="Q0mWOux0VZdwYrHigSTj" name="Page-1">
+        <mxGraphModel dx="1791" dy="952" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="2" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="Załączenie zasilania" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="10" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="10">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Konfiguracja peryferiów MCU" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="80" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="T" style="edgeStyle=none;html=1;" edge="1" parent="1" source="7" target="18">
+                    <mxGeometry x="-0.5" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="21" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="7" target="20">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="N" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="21">
+                    <mxGeometry x="-0.6" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="Czy&lt;br&gt;wystąpiło&lt;br&gt;przerwanie&lt;br&gt;z czujnika&lt;br&gt;Halla?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="310" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="10" target="13">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="Odczytaj dane&lt;br&gt;z czujników" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="135" y="140" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="13" target="7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Wyślij pierwszy pakiet danych do Raspberry" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="210" width="160" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" style="edgeStyle=none;html=1;" edge="1" parent="1" source="18">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="210" y="480" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="370" y="480"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="Inkrementuj zmienną zliczającą impulsy" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="310" y="345" width="120" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="N" style="edgeStyle=none;html=1;" edge="1" parent="1" source="20">
+                    <mxGeometry x="-0.907" relative="1" as="geometry">
+                        <mxPoint x="210" y="290" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="460" y="560"/>
+                            <mxPoint x="460" y="290"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="26" value="T" style="edgeStyle=none;html=1;" edge="1" parent="1" source="20" target="25">
+                    <mxGeometry x="-0.5" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" value="Czy&lt;br&gt;upłynął zadany interwał przesyłu danych?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="500" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="25" target="27">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="Oblicz średnią prędkość wiatru na podstawie dotychczasowej liczby impulsów" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="137.5" y="660" width="145" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="27" target="29">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="Odczytaj dane&lt;br&gt;z czujników" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="135" y="750" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="29" target="31">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="Wyślij pakiet danych do Raspberry" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="820" width="160" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" style="edgeStyle=none;html=1;" edge="1" parent="1" source="31">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="210" y="290" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="210" y="1000"/>
+                            <mxPoint x="80" y="1000"/>
+                            <mxPoint x="80" y="290"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="31" value="Zeruj zmienną zliczającą impulsy" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="910" width="120" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="34" target="35">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="Załączenie zasilania" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="625" y="10" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="35" target="61">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="Uruchomienie kontenerów z bazą danych i wizualizacją" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="625" y="75" width="120" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="37" target="39">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="Uruchomienie skryptu zbierającego dane z interfejsu komunikacyjnego" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="625" y="220" width="120" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" style="edgeStyle=none;html=1;" edge="1" parent="1" source="39">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="685" y="310" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="775" y="390"/>
+                            <mxPoint x="775" y="310"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="42" value="N" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="41">
+                    <mxGeometry x="-0.5" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="66" value="T" style="edgeStyle=none;html=1;" edge="1" parent="1" source="39" target="65">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="Czy&lt;br&gt;dane oczekują w buforze?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="625" y="330" width="120" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="63" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="61" target="37">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="61" value="Uruchomienie brokera mosquitto" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="625" y="150" width="120" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="64" target="68">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="64" value="Zapisz dane w bazie" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="570" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="67" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="65" target="64">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="65" value="Odczytaj i przetwórz&lt;br&gt;dane" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="490" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="70" style="edgeStyle=none;html=1;" edge="1" parent="1" source="68">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="685" y="310" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="685" y="740"/>
+                            <mxPoint x="590" y="740"/>
+                            <mxPoint x="590" y="310"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="Wyślij dane&lt;br&gt;poprzez MQTT" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="660" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="71" value="" style="endArrow=none;dashed=1;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="490" y="1070" as="sourcePoint"/>
+                        <mxPoint x="490" y="10" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="72" value="STM32" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=default;fillColor=none;dashed=1;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="45" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" value="Raspberry Pi" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=default;fillColor=none;dashed=1;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="45" width="90" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
