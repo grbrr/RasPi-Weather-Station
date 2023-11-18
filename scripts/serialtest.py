@@ -1,37 +1,24 @@
 import serial
 import json
 
-import influxdb_client, os, time
-from influxdb_client import InfluxDBClient, Point, WritePrecision
+import influxdb_client, os
+from influxdb_client import Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from dotenv import load_dotenv
 
+## Influx config
 load_dotenv()
-
-
 token = os.getenv("token")
 org = "Home"
 url = "http://weatherpi.local:8086"
-
 client = influxdb_client.InfluxDBClient(url=url, token=token, org=org)
-
 bucket = "Weather"
-
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
-""" for value in range(5):
-  point = (
-    Point("measurement1")
-    .tag("tagname1", "tagvalue1")
-    .field("field1", value)
-  )
-  write_api.write(bucket=bucket, org="Home", record=point)
-  time.sleep(1) # separate points by 1 second """
-
-
+## Serial config
 def init():
     x = serial.Serial(
-        port="/dev/rfcomm0",  # Replace ttyS0 with ttyAM0 for Pi1,Pi2,Pi0
+        port="/dev/rfcomm0", # BT serial port
         baudrate=9600,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
@@ -39,7 +26,6 @@ def init():
         timeout=1,
     )
     return x
-
 
 def get_JSON_from_serial():
     if ser.in_waiting == 0:
@@ -49,27 +35,20 @@ def get_JSON_from_serial():
         x = x.decode("utf-8")
         if x[0] == "{" and x[-3] == "}":
             data = json.loads(x)
-            return data
+            return data # returns dict
         else:
-            print(x)
+            print(x) # prints raw data for debugging purposes
             return None
     except Exception as e:
         print("Error while reading serial:", e)
         return None
-
-
-"""- int32_t for temperature with the units 100 * °C
-- uint32_t for humidity with the units 1024 * % relative humidity
-- uint32_t for pressure
-     If macro "BME280_64BIT_ENABLE" is enabled, which it is by default, the unit is 100 * Pascal
-     If this macro is disabled, Then the unit is in Pascal"""
 
 ser = init()
 while 1:
     try:
         data = get_JSON_from_serial()
     except Exception as e:
-        print("Error while reading serial:", e)
+        print("Communication lost, reconnecting...", e)
         data = None
         ser = init()
 
