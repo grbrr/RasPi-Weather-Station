@@ -53,6 +53,11 @@ Press CTRL-C for hangup
 To dedicate this port to this application, use `sudo rfcomm bind hci0 <MAC address>`.
 To disconnect use `sudo rfcomm release hci0`.
 
+<<<<<<< HEAD
+## External libraries used
+
+[BME280 driver, version 3.4.3](https://github.com/boschsensortec/BME280_driver/tree/bme280_v3.4.3), newer versions use [COINES API](https://github.com/boschsensortec/COINES), it doesn't fit to this project
+=======
 ## Sharp pinout
 
 | PIN | Function    | Connected to              |
@@ -63,3 +68,4 @@ To disconnect use `sudo rfcomm release hci0`.
 | 4   | S-GND       | RasPi GND   |
 | 5   | Vo          |    |
 | 6   | Vcc         | RasPi 5V    |
+>>>>>>> 045b22ca654ae2ab0f01cf5e658ac2137e49e781
