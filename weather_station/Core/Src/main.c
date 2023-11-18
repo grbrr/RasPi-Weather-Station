@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
-#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -59,16 +58,23 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
+void read_data(struct weather_data *data_collection);
+void transfer_data(const struct weather_data *data_collection);
+void delay_us(uint16_t us);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
 struct weather_data data_collection =
-		{ .temperature = 0, .pressure = 0, .humidity = 0, .ambient_light = 0,
-				.dust = 0 };
-uint32_t analog[1];
+{ .temperature = 0, .pressure = 0, .humidity = 0, .ambient_light = 0, .dust = 0,
+		.rotations = 0 };
+
+uint8_t request_data = 1;
+uint32_t anemometer_rotations = 0;
 /* USER CODE END 0 */
 
 /**
@@ -99,14 +105,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_TIM14_Init();
   MX_I2C1_Init();
   MX_ADC_Init();
+  MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start_IT(&htim14);
-	HAL_ADC_Start_DMA(&hadc, analog, 1);
+	HAL_TIM_Base_Start(&htim16);
+	HAL_ADC_Start(&hadc);
 
 	if (BME280_init() != BME280_OK)
 	{
@@ -118,27 +125,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		data_collection.dust = (uint16_t)analog[0];
+		//data_collection.dust =
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		if (BH1750_read_data(&data_collection) != HAL_OK)
+		if (request_data)
 		{
-			char data[80]; // Tablica przechowujaca wysylana wiadomosc.
-			uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
-			size = sprintf(data, "Error while reading BH1750\r\n");
-			HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
-		}
-		HAL_Delay(10);
-		if (BME280_read_data(&data_collection) != BME280_OK)
-		{
-			char data[80]; // Tablica przechowujaca wysylana wiadomosc.
-			uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
-			size = sprintf(data, "Error while reading BME280\r\n");
-			HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
+			read_data(&data_collection);
+			transfer_data(&data_collection);
+			request_data = 0;
 		}
 		HAL_Delay(100);
-
 	}
   /* USER CODE END 3 */
 }
@@ -192,17 +189,70 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	char data[200]; // Tablica przechowujaca wysylana wiadomosc.
-	uint16_t size = 0; // Rozmiar wysylanej wiadomosci ++cnt;
+	if (!request_data)
+		request_data = 1;
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == Hall_INT_Pin)
+	{
+		anemometer_rotations++;
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	}
+}
+
+void read_data(struct weather_data *data_collection)
+{
+	uint16_t size = 0;
+	if (BH1750_read_data(&*data_collection) != HAL_OK)
+	{
+		char data[80];
+		size = sprintf(data, "Error while reading BH1750\r\n");
+		HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
+	}
+	HAL_Delay(10);
+	if (BME280_read_data(&*data_collection) != BME280_OK)
+	{
+		char data[80];
+		size = sprintf(data, "Error while reading BME280\r\n");
+		HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
+	}
+	// reading dust
+	HAL_GPIO_WritePin(Sharp_LED_GPIO_Port, Sharp_LED_Pin, GPIO_PIN_RESET);
+	delay_us(280);
+	if (HAL_ADC_PollForConversion(&hadc, 10) == HAL_OK)
+	{
+		data_collection->dust = HAL_ADC_GetValue(&hadc);
+		HAL_ADC_Start(&hadc);
+	}
+	delay_us(40);
+	HAL_GPIO_WritePin(Sharp_LED_GPIO_Port, Sharp_LED_Pin, GPIO_PIN_SET);
+	// checking rotations
+	data_collection->rotations = anemometer_rotations;
+	anemometer_rotations = 0;
+}
+
+void transfer_data(const struct weather_data *data_collection)
+{
+	char data[500];
+	uint16_t size = 0;
 	size =
 			sprintf(data,
-					"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld, \"Ambient Light\" : %d}\r\n",
-					data_collection.temperature, data_collection.pressure,
-					data_collection.humidity, data_collection.ambient_light);
-
-	HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100); // Rozpoczecie nadawania danych z wykorzystaniem przerwan
-	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); // Zmiana stanu pinu na diodzie LED
+					"{\"Temperature\" : %ld, \"Pressure\" : %ld, \"Humidity\" : %ld, \"Ambient Light\" : %d, \"Dust\" : %d, \"Rotations\" : %ld}\r\n",
+					data_collection->temperature, data_collection->pressure,
+					data_collection->humidity, data_collection->ambient_light,
+					data_collection->dust, data_collection->rotations);
+	HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 200);
 }
+
+void delay_us(uint16_t us)
+{
+	__HAL_TIM_SET_COUNTER(&htim16, 0);  // set the counter value a 0
+	while (__HAL_TIM_GET_COUNTER(&htim16) < us)
+		;  // wait for the counter to reach the us input in the parameter
+}
+
 /* USER CODE END 4 */
 
 /**
