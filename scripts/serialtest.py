@@ -28,17 +28,22 @@ write_api = client.write_api(write_options=SYNCHRONOUS)
   write_api.write(bucket=bucket, org="Home", record=point)
   time.sleep(1) # separate points by 1 second """
 
-ser = serial.Serial(
-    port="/dev/ttyS0",  # Replace ttyS0 with ttyAM0 for Pi1,Pi2,Pi0
-    baudrate=115200,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS,
-    timeout=1,
-)
+
+def init():
+    x = serial.Serial(
+        port="/dev/rfcomm0",  # Replace ttyS0 with ttyAM0 for Pi1,Pi2,Pi0
+        baudrate=9600,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=1,
+    )
+    return x
 
 
 def get_JSON_from_serial():
+    if ser.in_waiting == 0:
+        return None
     x = ser.readline()
     try:
         x = x.decode("utf-8")
@@ -59,13 +64,27 @@ def get_JSON_from_serial():
      If macro "BME280_64BIT_ENABLE" is enabled, which it is by default, the unit is 100 * Pascal
      If this macro is disabled, Then the unit is in Pascal"""
 
+ser = init()
 while 1:
-    data = get_JSON_from_serial()
+    try:
+        data = get_JSON_from_serial()
+    except Exception as e:
+        print("Error while reading serial:", e)
+        data = None
+        ser = init()
+
     if data is not None:
         data["Temperature"] = data["Temperature"] / 100
         data["Humidity"] = round(data["Humidity"] / 1024, 2)
         data["Pressure"] = data["Pressure"] / 100
         data["Ambient Light"] = round(data["Ambient Light"] / 1.2, 2)
+        dustVoltage = data["Dust"] * 3.55 / 4096
+        if dustVoltage >= 0.6:
+            dustDensity = 0.17 * dustVoltage - 0.1
+        else:
+            dustDensity = 0
+        data["Dust"] = float(round(dustDensity, 2))
+        data["Wind Speed"] = round(data["Rotations"]*0.068*0.10472,2) # 0.068m circumference, 0.10472m/s per rotation
         print(str(data))
         record = (
             Point("BME280")
@@ -74,6 +93,8 @@ while 1:
             .field("Humidity", data["Humidity"])
             .field("Pressure", data["Pressure"])
             .field("Ambient Light", data["Ambient Light"])
+            .field("Dust2", data["Dust"])
+            .field("Wind Speed", data["Wind Speed"])
         )
         try:
             write_api.write(bucket=bucket, org="Home", record=record)
