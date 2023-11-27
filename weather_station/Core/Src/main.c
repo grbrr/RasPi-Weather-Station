@@ -116,7 +116,6 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim14);
 	HAL_TIM_Base_Start(&htim16);
 	HAL_ADC_Start(&hadc);
-
 	if (BME280_init() != BME280_OK)
 	{
 		printf("Blad inicjalizacji!\n");
@@ -127,16 +126,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
 		if (request_data)
 		{
 			read_data(&data_collection);
 			transfer_data(&data_collection);
 			request_data = 0;
+
 		}
-		HAL_Delay(100);
+		HAL_SuspendTick();
+		HAL_PWR_EnableSleepOnExit();
+		HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+		HAL_ResumeTick(); // Enable SysTick after wake-up
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		// HAL_Delay(100);
 	}
   /* USER CODE END 3 */
 }
@@ -192,6 +197,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (!request_data)
 		request_data = 1;
+	HAL_PWR_DisableSleepOnExit();
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
