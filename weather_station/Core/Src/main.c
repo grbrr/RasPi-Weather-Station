@@ -61,6 +61,7 @@ void SystemClock_Config(void);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
+uint16_t read_dust(void);
 void read_data(struct weather_data *data_collection);
 void transfer_data(const struct weather_data *data_collection);
 void delay_us(uint16_t us);
@@ -75,6 +76,7 @@ struct weather_data data_collection =
 
 uint8_t request_data = 1;
 uint32_t anemometer_rotations = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -125,7 +127,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		//data_collection.dust =
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -202,6 +203,28 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 }
 
+uint16_t read_dust(void)
+{
+	uint16_t dust = 0;
+	for (uint8_t i = 0; i < 10; i++)
+	{
+		HAL_GPIO_WritePin(Sharp_LED_GPIO_Port, Sharp_LED_Pin, GPIO_PIN_RESET);
+		delay_us(280);
+		if (HAL_ADC_PollForConversion(&hadc, 10) == HAL_OK)
+		{
+			dust += HAL_ADC_GetValue(&hadc);
+			HAL_ADC_Start(&hadc);
+		}
+		else
+			i--;
+
+		HAL_GPIO_WritePin(Sharp_LED_GPIO_Port, Sharp_LED_Pin, GPIO_PIN_SET);
+		HAL_Delay(10);
+	}
+	dust = (uint16_t) (dust / 10);
+	return dust;
+}
+
 void read_data(struct weather_data *data_collection)
 {
 	uint16_t size = 0;
@@ -218,16 +241,7 @@ void read_data(struct weather_data *data_collection)
 		size = sprintf(data, "Error while reading BME280\r\n");
 		HAL_UART_Transmit(&huart1, (uint8_t*) &data, size, 100);
 	}
-	// reading dust
-	HAL_GPIO_WritePin(Sharp_LED_GPIO_Port, Sharp_LED_Pin, GPIO_PIN_RESET);
-	delay_us(280);
-	if (HAL_ADC_PollForConversion(&hadc, 10) == HAL_OK)
-	{
-		data_collection->dust = HAL_ADC_GetValue(&hadc);
-		HAL_ADC_Start(&hadc);
-	}
-	delay_us(40);
-	HAL_GPIO_WritePin(Sharp_LED_GPIO_Port, Sharp_LED_Pin, GPIO_PIN_SET);
+	data_collection->dust = read_dust();
 	// checking rotations
 	data_collection->rotations = anemometer_rotations;
 	anemometer_rotations = 0;
