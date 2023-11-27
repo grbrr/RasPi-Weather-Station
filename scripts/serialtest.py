@@ -6,6 +6,10 @@ from influxdb_client import Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from dotenv import load_dotenv
 
+import os
+
+os.system('sudo rfcomm bind hci0 98:D3:C1:FD:EE:70')
+
 ## Influx config
 load_dotenv()
 token = os.getenv("token")
@@ -57,9 +61,10 @@ while 1:
         data["Humidity"] = round(data["Humidity"] / 1024, 2)
         data["Pressure"] = data["Pressure"] / 100
         data["Ambient Light"] = round(data["Ambient Light"] / 1.2, 2)
-        dustVoltage = data["Dust"] * 3.55 / 4096
-        if dustVoltage >= 0.6:
-            dustDensity = 0.17 * dustVoltage - 0.1
+        dustVoltage = data["Dust"] * 3.55 / 4096 # 3.55V max voltage of the sharp when powered with 5V, 12bit ADC, used voltage divider so physical voltage on pin is 3,3V when maxed out
+        print(dustVoltage)
+        if dustVoltage >= 0.4:
+            dustDensity = (dustVoltage - 0.4) * 1000 / 6 # 0.55V is the voltage when there is no dust, (0.6 normally but here we use 0.55 because of the voltage divider)
         else:
             dustDensity = 0
         data["Dust"] = float(round(dustDensity, 2))
